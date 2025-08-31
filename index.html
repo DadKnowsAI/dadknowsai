@@ -1,23 +1,50 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dad Knows AI</title>
-  <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-  <nav><img src="/img/logo.svg" alt="Dad Knows AI logo"></nav>
-  <main>
-    <h1>Practical AI help for people with miles of experience</h1>
-    <p>Ask everyday questions and get simple, trustworthy answers.</p>
-    <button onclick="loadChat()">Launch Chat</button>
-    <section id="newsletter">
-      <h2>Newsletter</h2>
-      <!-- Replace with Beehiiv embed -->
-      <form><input type="email" placeholder="Your email"><button>Subscribe</button></form>
-    </section>
-  </main>
-  <script src="/js/main.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <title>Dad Knows AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f9fafb;
+        color: #111;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        text-align: center;
+      }
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+      p {
+        font-size: 1.25rem;
+        max-width: 600px;
+        line-height: 1.5;
+      }
+      .button {
+        margin-top: 2rem;
+        padding: 0.75rem 1.5rem;
+        background: #2563eb;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+      }
+      .button:hover {
+        background: #1d4ed8;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>👋 Welcome to Dad Knows AI</h1>
+    <p>Helping everyday people understand and use AI in simple, plain English.  
+       From autocorrect to chatbots, AI is already part of your life — let’s make it work for you.</p>
+    <a href="https://weeklycall.dadknowsai.com" class="button">Read the Newsletter</a>
+  </body>
 </html>
