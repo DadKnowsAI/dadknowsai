@@ -15,7 +15,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100vh;
+        min-height: 100vh;
         text-align: center;
       }
       h1 {
@@ -26,9 +26,11 @@
         font-size: 1.25rem;
         max-width: 600px;
         line-height: 1.5;
+        margin-bottom: 2rem;
       }
       .button {
-        margin-top: 2rem;
+        display: inline-block;
+        margin-top: 1rem;
         padding: 0.75rem 1.5rem;
         background: #2563eb;
         color: #fff;
@@ -39,6 +41,51 @@
       .button:hover {
         background: #1d4ed8;
       }
+      .chatbox {
+        margin-top: 3rem;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        width: 100%;
+        max-width: 500px;
+        text-align: left;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+      .chatbox h2 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .messages {
+        border: 1px solid #eee;
+        padding: 0.75rem;
+        height: 200px;
+        overflow-y: auto;
+        background: #fafafa;
+        margin-bottom: 1rem;
+        border-radius: 6px;
+      }
+      .input-row {
+        display: flex;
+        gap: 0.5rem;
+      }
+      .input-row input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .input-row button {
+        padding: 0.5rem 1rem;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .input-row button:hover {
+        background: #1d4ed8;
+      }
     </style>
   </head>
   <body>
@@ -46,5 +93,18 @@
     <p>Helping everyday people understand and use AI in simple, plain English.  
        From autocorrect to chatbots, AI is already part of your life — let’s make it work for you.</p>
     <a href="https://weeklycall.dadknowsai.com" class="button">Read the Newsletter</a>
+
+    <div class="chatbox">
+      <h2>Try the Chatbot (demo)</h2>
+      <div class="messages">
+        <p><strong>Bot:</strong> Hi! Ask me anything about AI in everyday life.</p>
+      </div>
+      <div class="input-row">
+        <input type="text" placeholder="Type your message..." disabled>
+        <button disabled>Send</button>
+      </div>
+      <small style="color:#666">*This is just a preview — real chatbot coming soon.*</small>
+    </div>
   </body>
 </html>
+
