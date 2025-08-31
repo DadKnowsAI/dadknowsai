@@ -14,7 +14,7 @@
       }
       h1 { font-size: clamp(32px,5vw,48px); margin: 0 0 .5rem; }
       h3.tagline { font-size:1.25rem; font-weight:500; margin:0 0 1.5rem; color:#444; }
-      p.lead { font-size:1.2rem; line-height:1.5; max-width:700px; margin:1rem auto 2rem; }
+      p.lead { font-size:1.2rem; line-height:1.55; max-width:900px; margin:1rem auto 2rem; }
       .button {
         display:inline-block; margin-top:1rem; padding:.75rem 1.25rem;
         background:var(--blue); color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
@@ -22,32 +22,39 @@
       .button:hover { background:var(--blue-d); }
 
       .chatbox {
-        margin-top:1.5rem; background:#fff; border:1px solid #ddd; border-radius:10px;
-        padding:1rem; width:100%; max-width:720px; text-align:left; box-shadow:0 2px 6px rgba(0,0,0,.08);
+        margin-top:1.5rem; background:#fff; border:1px solid #ddd; border-radius:12px;
+        padding:1rem; width:100%; max-width:900px; text-align:left; box-shadow:0 2px 8px rgba(0,0,0,.08);
       }
-      .chatbox h2 { font-size:1.25rem; margin:.25rem 0 1rem; text-align:center; }
+      .chatbox h2 { font-size:1.35rem; margin:.25rem 0 1rem; text-align:center; }
 
       .messages {
-        border:1px solid #eee; border-radius:8px; background:#fafafa;
-        padding:.75rem; height:260px; overflow-y:auto; margin-bottom:1rem;
+        border:1px solid #e5e7eb; border-radius:10px; background:#fafafa;
+        padding:1rem; height: min(55vh, 520px); overflow-y:auto; margin-bottom:1rem;
+        font-size:1.05rem; line-height:1.6;
+        white-space:pre-line; /* preserve line breaks */
       }
-      .msg { margin:.25rem 0; }
+      .msg { margin:.5rem 0; }
       .msg.you strong { color:#0f172a; }
       .msg.bot strong { color:var(--blue-d); }
 
       .input-row { display:flex; gap:.5rem; }
       .input-row input {
         flex:1; padding:1rem; font-size:1.1rem; font-weight:600;
-        border:2px solid var(--blue); border-radius:8px;
+        border:2px solid var(--blue); border-radius:10px;
       }
       .input-row button {
-        padding:.85rem 1.1rem; font-size:1rem; font-weight:700;
-        background:var(--blue); color:#fff; border:none; border-radius:8px; cursor:pointer; min-width:92px;
+        padding:1rem 1.15rem; font-size:1rem; font-weight:700;
+        background:var(--blue); color:#fff; border:none; border-radius:10px; cursor:pointer; min-width:100px;
       }
       .input-row button:hover { background:var(--blue-d); }
 
       .note { margin-top:1rem; font-weight:600; color:#222; text-align:center; }
-      .footer-space { height:1rem; }
+
+      @media (max-width: 480px) {
+        body { padding: 1rem; }
+        .chatbox { padding: .75rem; }
+        .messages { font-size: 1rem; }
+      }
     </style>
   </head>
   <body>
@@ -71,7 +78,6 @@
 
     <p class="lead">Helping everyday people use AI in plain English. From autocorrect to chatbots, AI is already part of your life—let’s make it work for you.</p>
     <a href="https://weeklycall.dadknowsai.com" class="button">Read the Newsletter</a>
-    <div class="footer-space"></div>
 
     <!-- Chat script -->
     <script>
@@ -80,11 +86,19 @@
       const send  = document.getElementById('send-btn');
       const MAX_INPUT_CHARS = 700;
 
+      // Escape HTML + preserve newlines
+      function safeFormat(text) {
+        return text
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;');
+      }
+
       function append(role, text, danger=false) {
         const p = document.createElement('p');
         p.className = `msg ${role === 'You' ? 'you' : 'bot'}`;
         if (danger) p.style.color = 'crimson';
-        p.innerHTML = `<strong>${role}:</strong> ${text}`;
+        p.innerHTML = `<strong>${role}:</strong> ${safeFormat(text)}`;
         msgs.appendChild(p);
         msgs.scrollTop = msgs.scrollHeight;
       }
@@ -132,6 +146,7 @@
     </script>
   </body>
 </html>
+
 
 
 
