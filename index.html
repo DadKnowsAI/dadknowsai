@@ -5,135 +5,89 @@
     <title>Dad Knows AI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+      :root { --blue:#2563eb; --blue-d:#1d4ed8; --bg:#f9fafb; --text:#111; }
       body {
         font-family: system-ui, sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f9fafb;
-        color: #111;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        min-height: 100vh;
-        text-align: center;
-        padding: 2rem;
+        margin: 0; padding: 2rem;
+        background: var(--bg); color: var(--text);
+        display:flex; flex-direction:column; align-items:center; text-align:center; min-height:100vh;
       }
-      h1 {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-      }
-      p {
-        font-size: 1.25rem;
-        max-width: 600px;
-        line-height: 1.5;
-        margin-bottom: 2rem;
-      }
+      h1 { font-size: clamp(32px,5vw,48px); margin: 0 0 1rem; }
+      p.lead { font-size:1.2rem; line-height:1.5; max-width:700px; margin:1rem auto 2rem; }
       .button {
-        display: inline-block;
-        margin-top: 1rem;
-        padding: 0.75rem 1.5rem;
-        background: #2563eb;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: bold;
+        display:inline-block; margin-top:1rem; padding:.75rem 1.25rem;
+        background:var(--blue); color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
       }
-      .button:hover {
-        background: #1d4ed8;
-      }
+      .button:hover { background:var(--blue-d); }
+
       .chatbox {
-        margin-top: 2rem;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 1rem;
-        width: 100%;
-        max-width: 500px;
-        text-align: left;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-top:1.5rem; background:#fff; border:1px solid #ddd; border-radius:10px;
+        padding:1rem; width:100%; max-width:720px; text-align:left; box-shadow:0 2px 6px rgba(0,0,0,.08);
       }
-      .chatbox h2 {
-        font-size: 1.25rem;
-        margin-bottom: 1rem;
-        text-align: center;
-      }
+      .chatbox h2 { font-size:1.25rem; margin:.25rem 0 1rem; text-align:center; }
+
       .messages {
-        border: 1px solid #eee;
-        padding: 0.75rem;
-        height: 200px;
-        overflow-y: auto;
-        background: #fafafa;
-        margin-bottom: 1rem;
-        border-radius: 6px;
+        border:1px solid #eee; border-radius:8px; background:#fafafa;
+        padding:.75rem; height:260px; overflow-y:auto; margin-bottom:1rem;
       }
-      .input-row {
-        display: flex;
-        gap: 0.5rem;
-      }
+      .msg { margin:.25rem 0; }
+      .msg.you strong { color:#0f172a; }
+      .msg.bot strong { color:var(--blue-d); }
+
+      .input-row { display:flex; gap:.5rem; }
       .input-row input {
-        flex: 1;
-        padding: 1rem;               /* bigger padding */
-        font-size: 1.1rem;            /* larger font */
-        font-weight: 600;             /* bold */
-        border: 2px solid #2563eb;    /* theme border */
-        border-radius: 6px;
+        flex:1; padding:1rem; font-size:1.1rem; font-weight:600;
+        border:2px solid var(--blue); border-radius:8px;
       }
       .input-row button {
-        padding: 0.75rem 1.25rem;     /* slightly bigger button */
-        font-size: 1rem;
-        font-weight: 600;
-        background: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
+        padding:.85rem 1.1rem; font-size:1rem; font-weight:700;
+        background:var(--blue); color:#fff; border:none; border-radius:8px; cursor:pointer; min-width:92px;
       }
-      .input-row button:hover {
-        background: #1d4ed8;
-      }
+      .input-row button:hover { background:var(--blue-d); }
+
+      .note { margin-top:1rem; font-weight:600; color:#222; text-align:center; }
+      .footer-space { height:1rem; }
     </style>
   </head>
   <body>
     <h1>👋 Welcome to Dad Knows AI</h1>
 
-    <!-- Chatbox directly under title -->
-    <div class="chatbox">
+    <div class="chatbox" role="region" aria-label="DadKnowsAI Chat">
       <h2>Ask Dad Knows AI</h2>
-      <div class="messages" id="messages">
-        <p><strong>DadKnowsAI:</strong> Hi! Ask me anything about AI in everyday life.</p>
+
+      <div class="messages" id="messages" aria-live="polite">
+        <p class="msg bot"><strong>DadKnowsAI:</strong> Ask me something practical. I’ll give you clear steps—and code when it helps.</p>
       </div>
+
       <div class="input-row">
-        <input id="chat-input" type="text" placeholder="Type your message...">
-        <button id="send-btn">Send</button>
+        <input id="chat-input" type="text" placeholder="Type your message..." aria-label="Your message">
+        <button id="send-btn" aria-label="Send message">Send</button>
       </div>
-      <p style="margin-top:1rem; font-weight:600; color:#222; text-align:center;">
-        ⚡ Responses are generated live by <span style="color:#2563eb;">DadKnowsAI</span>
-      </p>
+
+      <p class="note">⚡ Responses are generated live by <span style="color:var(--blue);">DadKnowsAI</span></p>
     </div>
 
-    <p>Helping everyday people understand and use AI in simple, plain English.  
-       From autocorrect to chatbots, AI is already part of your life — let’s make it work for you.</p>
+    <p class="lead">Helping everyday people use AI in plain English. From autocorrect to chatbots, AI is already part of your life—let’s make it work for you.</p>
     <a href="https://weeklycall.dadknowsai.com" class="button">Read the Newsletter</a>
+    <div class="footer-space"></div>
 
-    <!-- Chatbot script -->
+    <!-- Chat script -->
     <script>
       const msgs = document.getElementById('messages');
       const input = document.getElementById('chat-input');
-      const send = document.getElementById('send-btn');
-
-      const MAX_INPUT_CHARS = 500;
+      const send  = document.getElementById('send-btn');
+      const MAX_INPUT_CHARS = 700;
 
       function append(role, text, danger=false) {
         const p = document.createElement('p');
+        p.className = `msg ${role === 'You' ? 'you' : 'bot'}`;
         if (danger) p.style.color = 'crimson';
         p.innerHTML = `<strong>${role}:</strong> ${text}`;
         msgs.appendChild(p);
         msgs.scrollTop = msgs.scrollHeight;
       }
 
-      async function sendMsg() {
-        const text = input.value.trim();
+      async function ask(text) {
         if (!text) return;
         if (text.length > MAX_INPUT_CHARS) {
           append('System', `Please keep messages under ${MAX_INPUT_CHARS} characters.`, true);
@@ -145,7 +99,8 @@
 
         append('You', text);
         const typing = document.createElement('p');
-        typing.id = 'typing'; typing.innerHTML = '<em>DadKnowsAI is typing…</em>';
+        typing.id = 'typing'; typing.className = 'msg bot';
+        typing.innerHTML = '<em>DadKnowsAI is typing…</em>';
         msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
 
         try {
@@ -162,20 +117,20 @@
           } else {
             append('DadKnowsAI', data.reply || '(no reply)');
           }
-        } catch (e) {
+        } catch {
           document.getElementById('typing')?.remove();
           append('Error', 'Network error contacting DadKnowsAI.', true);
         } finally {
-          input.disabled = false; send.disabled = false;
-          input.focus();
+          input.disabled = false; send.disabled = false; input.focus();
         }
       }
 
-      send.addEventListener('click', sendMsg);
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+      send.addEventListener('click', () => ask(input.value.trim()));
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') ask(input.value.trim()); });
     </script>
   </body>
 </html>
+
 
 
 
