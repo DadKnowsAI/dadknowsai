@@ -12,7 +12,8 @@
         background: var(--bg); color: var(--text);
         display:flex; flex-direction:column; align-items:center; text-align:center; min-height:100vh;
       }
-      h1 { font-size: clamp(32px,5vw,48px); margin: 0 0 1rem; }
+      h1 { font-size: clamp(32px,5vw,48px); margin: 0 0 .5rem; }
+      h3.tagline { font-size:1.25rem; font-weight:500; margin:0 0 1.5rem; color:#444; }
       p.lead { font-size:1.2rem; line-height:1.5; max-width:700px; margin:1rem auto 2rem; }
       .button {
         display:inline-block; margin-top:1rem; padding:.75rem 1.25rem;
@@ -51,9 +52,10 @@
   </head>
   <body>
     <h1>👋 Welcome to Dad Knows AI</h1>
+    <h3 class="tagline">You have the experience. We have the horsepower.</h3>
 
     <div class="chatbox" role="region" aria-label="DadKnowsAI Chat">
-      <h2>Ask me a question!</h2>
+      <h2>Ask me anything!</h2>
 
       <div class="messages" id="messages" aria-live="polite">
         <p class="msg bot"><strong>DadKnowsAI:</strong> Tell me what you’re trying to do. I’ll give clear steps that work today.</p>
@@ -101,7 +103,36 @@
         const typing = document.createElement('p');
         typing.id = 'typing'; typing.className = 'msg bot';
         typing.innerHTML = '<em>DadKnowsAI is typing…</em>';
-        msgs.appendChild(typing); msgs.scrollT
+        msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
+
+        try {
+          const r = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+          });
+          const data = await r.json().catch(() => ({}));
+          document.getElementById('typing')?.remove();
+
+          if (!r.ok) {
+            append('Error', data?.error || 'Request failed.', true);
+          } else {
+            append('DadKnowsAI', data.reply || '(no reply)');
+          }
+        } catch {
+          document.getElementById('typing')?.remove();
+          append('Error', 'Network error contacting DadKnowsAI.', true);
+        } finally {
+          input.disabled = false; send.disabled = false; input.focus();
+        }
+      }
+
+      send.addEventListener('click', () => ask(input.value.trim()));
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') ask(input.value.trim()); });
+    </script>
+  </body>
+</html>
+
 
 
 
