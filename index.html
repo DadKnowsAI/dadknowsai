@@ -53,10 +53,10 @@
     <h1>👋 Welcome to Dad Knows AI</h1>
 
     <div class="chatbox" role="region" aria-label="DadKnowsAI Chat">
-      <h2>Ask Dad Knows AI</h2>
+      <h2>Ask me a question!</h2>
 
       <div class="messages" id="messages" aria-live="polite">
-        <p class="msg bot"><strong>DadKnowsAI:</strong> Ask me something practical. I’ll give you clear steps—and code when it helps.</p>
+        <p class="msg bot"><strong>DadKnowsAI:</strong> Tell me what you’re trying to do. I’ll give clear steps that work today.</p>
       </div>
 
       <div class="input-row">
@@ -101,35 +101,8 @@
         const typing = document.createElement('p');
         typing.id = 'typing'; typing.className = 'msg bot';
         typing.innerHTML = '<em>DadKnowsAI is typing…</em>';
-        msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
+        msgs.appendChild(typing); msgs.scrollT
 
-        try {
-          const r = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-          });
-          const data = await r.json().catch(() => ({}));
-          document.getElementById('typing')?.remove();
-
-          if (!r.ok) {
-            append('Error', data?.error || 'Request failed.', true);
-          } else {
-            append('DadKnowsAI', data.reply || '(no reply)');
-          }
-        } catch {
-          document.getElementById('typing')?.remove();
-          append('Error', 'Network error contacting DadKnowsAI.', true);
-        } finally {
-          input.disabled = false; send.disabled = false; input.focus();
-        }
-      }
-
-      send.addEventListener('click', () => ask(input.value.trim()));
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') ask(input.value.trim()); });
-    </script>
-  </body>
-</html>
 
 
 
