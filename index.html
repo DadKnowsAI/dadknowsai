@@ -13,7 +13,7 @@
       --card: #0f152b;
       --muted: #a6b0cf;
       --text: #e7ecff;
-      --primary: #5b8cff;      /* blue */
+      --primary: #5b8cff;
       --primary-2:#3e6ff1;
       --outline: #1f2a4d;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -49,9 +49,7 @@
       display:flex; flex-direction:column; align-items:center;
     }
 
-    header{
-      text-align:center; margin-bottom:18px;
-    }
+    header{ text-align:center; margin-bottom:18px; }
     .brand{
       display:flex; align-items:center; justify-content:center; gap:12px;
       color:inherit; text-decoration:none;
@@ -63,14 +61,8 @@
       color:#fff;font-weight:800;letter-spacing:.5px;
       box-shadow:var(--shadow);
     }
-    .brand-title{
-      font-size: clamp(34px, 6vw, 60px);
-      margin:0; letter-spacing:.3px; font-weight:800;
-    }
-    .tagline{
-      font-size: clamp(16px, 2.5vw, 20px);
-      color:var(--muted); margin:6px 0 8px; font-weight:600;
-    }
+    .brand-title{ font-size: clamp(34px, 6vw, 60px); margin:0; letter-spacing:.3px; font-weight:800; }
+    .tagline{ font-size: clamp(16px, 2.5vw, 20px); color:var(--muted); margin:6px 0 8px; font-weight:600; }
 
     /* Centered chat wrapper */
     .center-wrap{
@@ -96,21 +88,21 @@
       padding:18px 18px 0;
       height: min(62vh, 560px);
       overflow:auto; scrollbar-width:thin;
+      scroll-behavior: smooth; /* smooth only when we decide to scroll */
     }
+
     /* Chat bubbles — bigger & bolder */
     .bubble{
       max-width: 92%;
       padding:14px 16px;border-radius:16px;
       margin:10px 0; line-height:1.65;
-      font-size:18px;               /* bigger text */
-      font-weight:600;              /* bolder */
+      font-size:18px;
+      font-weight:600;
       white-space:pre-line;
     }
     .me   { background:rgba(91,140,255,.14); border:1px solid rgba(91,140,255,.35); margin-left:auto; }
     .bot  { background:#0c1122; border:1px solid var(--outline); color:var(--text); }
-    @media (prefers-color-scheme: light){
-      .bot{ background:#ffffff; color:#0e1329; }
-    }
+    @media (prefers-color-scheme: light){ .bot{ background:#ffffff; color:#0e1329; } }
     .bubble strong{ color: var(--primary); }
 
     .composer{
@@ -144,7 +136,7 @@
 
     footer{
       width:100%; text-align:center; color:var(--muted); font-size:14px;
-      padding:10px 16px 26px; /* extra bottom space so nothing is cut off */
+      padding:10px 16px 26px;
     }
 
     @media (max-width: 520px){
@@ -195,20 +187,62 @@
     const chatbox = document.getElementById('chatbox');
     const msg     = document.getElementById('msg');
     const sendBtn = document.getElementById('send');
-    const yearEl  = document.getElementById('y');
-    yearEl.textContent = new Date().getFullYear();
+    document.getElementById('y').textContent = new Date().getFullYear();
 
     const MAX = 700;
+    const STICKY_THRESHOLD = 80; // px from bottom to count as “near bottom”
 
-    // Helper: add chat bubble
-    function addBubble(text, who){
+    // Is the viewer already near the bottom (then we keep them there)?
+    function isNearBottom() {
+      return (chatbox.scrollHeight - chatbox.scrollTop - chatbox.clientHeight) < STICKY_THRESHOLD;
+    }
+    function scrollToBottom() { chatbox.scrollTop = chatbox.scrollHeight; }
+
+    // Add bubble, with "smart" autoscroll:
+    // - For your own messages we scroll (feels natural).
+    // - For bot messages, only scroll if the user is near the bottom already.
+    function addBubble(text, who, opts = { autoscroll: 'smart' }) {
       const b = document.createElement('div');
       b.className = `bubble ${who}`;
       b.innerHTML = sanitize(text);
+      const shouldStick = isNearBottom();
       chatbox.appendChild(b);
-      chatbox.scrollTop = chatbox.scrollHeight;
+
+      if (opts.autoscroll === 'always' || (opts.autoscroll === 'smart' && (who === 'me' || shouldStick))) {
+        scrollToBottom();
+      }
       return b;
     }
+
+    // Incrementally fill a bubble (simulated streaming) without yanking scroll
+    async function streamIntoBubble(bubble, fullText) {
+      const shouldStick = isNearBottom(); // capture stickiness at start
+      const chunks = splitForStreaming(fullText);
+      for (const chunk of chunks) {
+        bubble.innerHTML += sanitize(chunk);
+        if (shouldStick && isNearBottom()) scrollToBottom();
+        await sleep(18); // small delay; adjust for faster/slower typing feel
+      }
+    }
+
+    // Split text into small chunks preserving newlines and paragraphs
+    function splitForStreaming(text) {
+      // Break by lines, but keep newline characters so white-space:pre-line renders them.
+      const lines = text.split(/(\r?\n)/);
+      // Further split long lines into ~120-char chunks
+      const chunks = [];
+      for (let part of lines) {
+        if (part === '\n' || part === '\r\n') { chunks.push(part); continue; }
+        while (part.length > 120) {
+          chunks.push(part.slice(0, 120));
+          part = part.slice(120);
+        }
+        chunks.push(part);
+      }
+      return chunks;
+    }
+
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
     // Escape HTML, keep line breaks (white-space:pre-line handles rendering)
     function sanitize(t){
@@ -223,7 +257,7 @@
       const text = msg.value.trim();
       if(!text) return;
       if(text.length > MAX){
-        addBubble(`Please keep messages under ${MAX} characters.`, 'bot');
+        addBubble(`Please keep messages under ${MAX} characters.`, 'bot', {autoscroll:'smart'});
         return;
       }
 
@@ -232,8 +266,9 @@
       msg.disabled = true;
       sendBtn.disabled = true;
 
-      addBubble(text, 'me');
-      const typing = addBubble('DadKnowsAI is typing…', 'bot');
+      addBubble(text, 'me', {autoscroll:'always'});
+
+      const typing = addBubble('DadKnowsAI is typing…', 'bot', {autoscroll:'smart'});
 
       try{
         const r = await fetch('/api/chat', {
@@ -246,13 +281,15 @@
         typing.remove();
 
         if(!r.ok){
-          addBubble(data?.error || 'Something went wrong. Please try again.', 'bot');
+          addBubble(data?.error || 'Something went wrong. Please try again.', 'bot', {autoscroll:'smart'});
         }else{
-          addBubble(data.reply || '(no reply)', 'bot');
+          // Create an empty bubble and stream the text into it
+          const bubble = addBubble('', 'bot', {autoscroll:'smart'});
+          await streamIntoBubble(bubble, data.reply || '(no reply)');
         }
       }catch(e){
         typing.remove();
-        addBubble('Network error contacting DadKnowsAI.', 'bot');
+        addBubble('Network error contacting DadKnowsAI.', 'bot', {autoscroll:'smart'});
       }finally{
         msg.disabled = false;
         sendBtn.disabled = false;
@@ -264,13 +301,14 @@
     sendBtn.addEventListener('click', ask);
     msg.addEventListener('keydown', e => {
       if(e.key === 'Enter'){
-        e.preventDefault(); // prevent accidental form submission on some browsers
+        e.preventDefault();
         ask();
       }
     });
   </script>
 </body>
 </html>
+
 
 
 
