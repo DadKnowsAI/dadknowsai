@@ -1,35 +1,36 @@
 // api/chat.js — Vercel Serverless Function
 // Practical, non-code-first answers with readable formatting.
-// Output uses clear section headers and line breaks.
-// Includes basic guards (rate limit, size, timeout).
+// Output uses clear section headers and line breaks so it renders cleanly in chat bubbles.
 
-let hits = new Map();
-const WINDOW_MS = 60_000;
-const MAX_REQ_PER_WINDOW = 20;
-const MAX_INPUT_CHARS = 700;
-const REPLY_MAX_TOKENS = 650;
-const TIMEOUT_MS = 20_000;
+let hits = new Map();                 // per-instance, best-effort limiter
+const WINDOW_MS = 60_000;             // 1 minute window
+const MAX_REQ_PER_WINDOW = 20;        // 20 requests/min/IP
+const MAX_INPUT_CHARS = 700;          // keep prompts short & focused
+const REPLY_MAX_TOKENS = 650;         // concise but useful
+const TIMEOUT_MS = 20_000;            // 20s upstream timeout
 
 // ---- Formatting-first system prompt ----
 const SYSTEM = `
 You are DadKnowsAI — a calm, practical helper for adults 45+.
-Give non-technical, real-world steps that work on common devices/apps.
-Use code only if a non-code path is impractical.
+Default to non-technical, real-world steps that work on common phones and computers.
+Use code only if a non-code path is impractical, and keep code short.
 
-FORMAT (follow exactly; use line breaks liberally):
+FORMAT (follow exactly; use line breaks liberally — each list item on its own line):
 
 What to do:
 1. Step one…
 2. Step two…
 3. Step three…
+(3–7 steps total)
 
 Tips & gotchas:
 - Tip one…
 - Tip two…
+(2–4 bullets)
 
 Sources:
-- Name reputable sources or give exact search phrases. Do NOT invent URLs.
-- Example: Owner’s manual (Search: "2008 Dodge Ram owner's manual PDF Mopar").
+- Name reputable sources or give precise search phrases. Do NOT invent URLs.
+- Example: Owner’s manual (Search: "2008 Dodge Ram owner's manual PDF Mopar")
 
 Disclaimer:
 I’m not perfect, and models can miss details. Based on what I can gather, here’s the safe approach.
@@ -38,12 +39,13 @@ Close with:
 Want a more detailed, step-by-step walkthrough tailored to your exact model/app?
 
 STYLE:
-- No "Summary:" section.
-- Plain English; minimal jargon; define acronyms once if needed.
-- Only ask clarifying questions if essential; otherwise infer likely intent and proceed.
-- Avoid medical/legal/financial advice; suggest safer alternatives when relevant.
+- Do NOT start with "Summary:" — jump straight into helpful action.
+- Plain English, minimal jargon; define acronyms once if needed.
+- If user is vague, infer likely intent and proceed; only ask clarifying questions if essential.
+- Avoid medical, legal, or financial advice; suggest safer alternatives when relevant.
 `;
 
+// Few-shot to anchor structure/tone (no URLs invented; line-broken lists)
 const FEW_SHOTS = [
   {
     role: "user",
@@ -65,7 +67,7 @@ Tips & gotchas:
 - Check "Later" and "Read Weekend" weekly so you don’t miss anything.
 
 Sources:
-- Gmail Help — Filters and blocked addresses (Search: "Gmail create filter help").
+- Gmail Help — Filters / blocked addresses (Search: "Gmail create filter help").
 - Microsoft Outlook Rules (Search: "Outlook create rule move messages").
 
 Disclaimer:
@@ -90,7 +92,7 @@ export default async function handler(req, res) {
       return res.status(413).json({ error: `Message too long (max ${MAX_INPUT_CHARS} chars).` });
     }
 
-    // Naive per-IP rate limit (per instance)
+    // --- Naive per-IP rate limit (per instance) ---
     const ip =
       req.headers["x-forwarded-for"]?.toString().split(",")[0].trim() ||
       req.socket?.remoteAddress ||
@@ -98,25 +100,29 @@ export default async function handler(req, res) {
     const now = Date.now();
     const rec = hits.get(ip) || { count: 0, windowStart: now };
     if (now - rec.windowStart > WINDOW_MS) {
-      rec.count = 0; rec.windowStart = now;
+      rec.count = 0;
+      rec.windowStart = now;
     }
-    rec.count += 1; hits.set(ip, rec);
+    rec.count += 1;
+    hits.set(ip, rec);
     if (rec.count > MAX_REQ_PER_WINDOW) {
       const retry = Math.max(0, WINDOW_MS - (now - rec.windowStart));
       res.setHeader("Retry-After", Math.ceil(retry / 1000));
       return res.status(429).json({ error: "Too many requests. Try again shortly." });
     }
 
-    // Timeout controller
+    // --- Timeout guard ---
     const controller = new AbortController();
     const tid = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+    // --- Compose messages ---
     const messages = [
       { role: "system", content: SYSTEM },
       ...FEW_SHOTS,
       { role: "user", content: message }
     ];
 
+    // --- Call OpenAI ---
     const r = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -125,7 +131,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        temperature: 0.5,
+        temperature: 0.5,            // practical + specific
         max_tokens: REPLY_MAX_TOKENS,
         presence_penalty: 0.0,
         frequency_penalty: 0.1,
@@ -152,6 +158,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Server error." });
   }
 }
+
 
 
 
