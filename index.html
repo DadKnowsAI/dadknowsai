@@ -18,14 +18,16 @@
       --outline: #1f2a4d;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 16px;
-      --highlight: rgba(255, 241, 118, .9); /* soft yellow */
+
+      /* Light, transparent blue highlight for the active sentence */
+      --sentence-highlight: rgba(91,140,255,0.18);
     }
     @media (prefers-color-scheme: light) {
       :root{
         --bg:#f7f8ff; --card:#ffffff; --muted:#5b5f73; --text:#0e1329;
         --primary:#2d5bff; --primary-2:#1f47dd; --outline:#e6e8f5;
         --shadow: 0 10px 30px rgba(14,19,41,.08);
-        --highlight: rgba(255, 237, 145, .9);
+        --sentence-highlight: rgba(45,91,255,0.14);
       }
     }
 
@@ -38,52 +40,35 @@
                   radial-gradient(1000px 700px at 100% 0%, rgba(16,185,129,.14), transparent 50%),
                   var(--bg);
       color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
       display:flex; flex-direction:column; min-height:100vh;
     }
 
     .container{
-      width:100%;
-      max-width:1080px;
-      margin:0 auto;
-      padding:24px 20px 32px;
+      width:100%; max-width:1080px; margin:0 auto; padding:24px 20px 32px;
       display:flex; flex-direction:column; align-items:center;
     }
 
     header{ text-align:center; margin-bottom:18px; }
-    .brand{
-      display:flex; align-items:center; justify-content:center; gap:12px;
-      color:inherit; text-decoration:none;
-    }
+    .brand{ display:flex; align-items:center; justify-content:center; gap:12px; color:inherit; text-decoration:none; }
     .logo{
       width:44px;height:44px;border-radius:10px;
       background: linear-gradient(135deg,var(--primary),#7aa6ff 60%);
-      display:grid;place-items:center;
-      color:#fff;font-weight:800;letter-spacing:.5px;
-      box-shadow:var(--shadow);
+      display:grid;place-items:center;color:#fff;font-weight:800;letter-spacing:.5px; box-shadow:var(--shadow);
     }
     .brand-title{ font-size: clamp(34px, 6vw, 60px); margin:0; letter-spacing:.3px; font-weight:800; }
     .tagline{ font-size: clamp(16px, 2.5vw, 20px); color:var(--muted); margin:6px 0 8px; font-weight:600; }
 
     /* Centered chat wrapper */
-    .center-wrap{
-      width:100%;
-      display:flex; justify-content:center; align-items:stretch;
-      padding:16px 0 12px;
-    }
+    .center-wrap{ width:100%; display:flex; justify-content:center; align-items:stretch; padding:16px 0 12px; }
 
     /* Chat card */
     .card{
       background:var(--card); border:1px solid var(--outline);
       border-radius:var(--radius); box-shadow:var(--shadow);
-      width:min(900px, 92vw);
-      display:flex; flex-direction:column;
+      width:min(900px, 92vw); display:flex; flex-direction:column;
     }
-    .card header{
-      padding:18px 20px; border-bottom:1px solid var(--outline);
-      text-align:center; margin:0;
-    }
+    .card header{ padding:18px 20px; border-bottom:1px solid var(--outline); text-align:center; margin:0; }
     .card header h2{ margin:0; font-size:20px; letter-spacing:.2px; }
 
     .chatbox{
@@ -106,47 +91,26 @@
     @media (prefers-color-scheme: light){ .bot{ background:#ffffff; color:#0e1329; } }
     .bubble strong{ color: var(--primary); }
 
-    /* Highlighted current word */
-    .typing-word{
-      background: var(--highlight);
-      border-radius: 4px;
-      transition: background-color .18s ease-out;
-      padding: 0 2px;
-    }
+    /* Active sentence highlight */
+    .sentence{ border-radius:6px; padding:0 2px; }
+    .typing-sentence{ background: var(--sentence-highlight); transition: background-color .25s ease; }
 
-    .composer{
-      display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--outline);
-    }
+    .composer{ display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--outline); }
     .input{
       flex:1; border:2px solid var(--outline); background:transparent; color:var(--text);
       border-radius:12px; padding:14px; font-size:17px; font-weight:700;
     }
-    .send{
-      padding:14px 18px; border-radius:12px; background:var(--primary);
-      color:#fff; border:0; font-weight:800; cursor:pointer; box-shadow:var(--shadow);
-    }
+    .send{ padding:14px 18px; border-radius:12px; background:var(--primary); color:#fff; border:0; font-weight:800; cursor:pointer; box-shadow:var(--shadow); }
     .send:hover{ background:var(--primary-2) }
 
-    .notice{
-      padding:8px 18px 16px; color:var(--muted); font-weight:600;
-    }
+    .notice{ padding:8px 18px 16px; color:var(--muted); font-weight:600; }
 
     /* Bottom newsletter CTA */
-    .footer-cta{
-      display:flex; flex-direction:column; align-items:center; gap:16px;
-      width:100%; margin:22px 0 8px;
-    }
-    .btn-newsletter{
-      display:inline-block; font-weight:800; letter-spacing:.2px;
-      background:var(--primary); color:#fff; text-decoration:none;
-      padding:14px 20px; border-radius:14px; box-shadow:var(--shadow);
-    }
+    .footer-cta{ display:flex; flex-direction:column; align-items:center; gap:16px; width:100%; margin:22px 0 8px; }
+    .btn-newsletter{ display:inline-block; font-weight:800; letter-spacing:.2px; background:var(--primary); color:#fff; text-decoration:none; padding:14px 20px; border-radius:14px; box-shadow:var(--shadow); }
     .btn-newsletter:hover{ background:var(--primary-2); }
 
-    footer{
-      width:100%; text-align:center; color:var(--muted); font-size:14px;
-      padding:10px 16px 26px;
-    }
+    footer{ width:100%; text-align:center; color:var(--muted); font-size:14px; padding:10px 16px 26px; }
 
     @media (max-width: 520px){
       .bubble{ font-size:17px; }
@@ -192,12 +156,12 @@
   </div>
 
   <script>
-    // ====== Config: tune the "speaking pace" here ======
-    const WORD_DELAY_MS   = 140;  // ~120–180 feels like speaking pace
-    const PUNCT_PAUSE_MS  = 90;   // extra pause after , ; :
-    const SENTENCE_PAUSE_MS = 220; // extra pause after . ? !
-    const STICKY_THRESHOLD = 80;   // px from bottom to consider "near bottom"
-    const MAX_INPUT = 700;
+    // ====== Typing pace / behavior ======
+    const WORD_DELAY_MS      = 135;  // per word (speaking pace ~120–180ms)
+    const PUNCT_PAUSE_MS     = 90;   // after , ; :
+    const SENTENCE_PAUSE_MS  = 240;  // after . ? !
+    const STICKY_THRESHOLD   = 80;   // px from bottom to consider "near bottom"
+    const MAX_INPUT          = 700;
 
     // ====== Elements ======
     const chatbox = document.getElementById('chatbox');
@@ -205,108 +169,100 @@
     const sendBtn = document.getElementById('send');
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // ====== Helpers ======
-    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-    function isNearBottom(){
-      return (chatbox.scrollHeight - chatbox.scrollTop - chatbox.clientHeight) < STICKY_THRESHOLD;
-    }
-    function scrollToBottom(){ chatbox.scrollTop = chatbox.scrollHeight; }
+    // ====== Utils ======
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const isNearBottom = () => (chatbox.scrollHeight - chatbox.scrollTop - chatbox.clientHeight) < STICKY_THRESHOLD;
+    const scrollToBottom = () => { chatbox.scrollTop = chatbox.scrollHeight; };
 
-    // Minimal escaping (we render words via textNodes to avoid HTML issues)
-    function esc(s){
-      return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-    }
-
-    // Add bubble and (optionally) keep view stuck to bottom
-    function addBubbleInitial(text, who, keepBottom=false){
+    // Add a new bubble
+    function addBubble(text, who, stick=false) {
       const b = document.createElement('div');
       b.className = `bubble ${who}`;
-      // start content if provided
       if (text) b.textContent = text;
       chatbox.appendChild(b);
-      if (keepBottom && isNearBottom()) scrollToBottom();
+      if (stick && isNearBottom()) scrollToBottom();
       return b;
     }
 
-    // Tokenize into words, whitespace, punctuation; keep order.
-    // Includes Unicode apostrophes and dashes.
-    function tokenize(str){
+    // Tokenize words / whitespace / punctuation (keep order)
+    function tokenize(line){
       const re = /(\r?\n|\s+|[A-Za-z0-9_’'’-]+|[^\sA-Za-z0-9_’'’-])/g;
-      return str.match(re) || [];
+      return line.match(re) || [];
     }
 
-    // Stream text into a bubble word-by-word with highlight.
-    async function streamWords(bubble, fullText, forceStick=false){
-      const shouldStick = forceStick || isNearBottom();
-      const tokens = tokenize(fullText);
+    // Split into sentences while preserving delimiters and trailing spaces.
+    function splitIntoSentences(text){
+      const out = [];
+      const re = /[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g; // match up to end punctuation + trailing space OR last chunk
+      const matches = text.match(re);
+      if (!matches) return [text];
+      return matches;
+    }
 
-      // We build using DOM nodes (text + spans) to avoid unsafe HTML.
-      // When a token is a "word", we wrap in span.typing-word, then remove highlight after a beat.
-      let lastWordSpan = null;
+    // Stream one sentence: create a highlighted sentence span; add tokens word-by-word;
+    // remove the sentence highlight when done.
+    async function streamSentence(bubble, sentence, stick){
+      // Separate trailing whitespace (to keep highlight tight to sentence)
+      const m = sentence.match(/^(.*?)(\s*)$/s);
+      const core = m ? m[1] : sentence;
+      const trailing = m ? m[2] : '';
 
-      for (let i=0; i<tokens.length; i++){
-        const t = tokens[i];
+      const span = document.createElement('span');
+      span.className = 'sentence typing-sentence';
+      bubble.appendChild(span);
 
-        // If newline: append a <br>
-        if (t === '\n' || t === '\r\n'){
-          if (lastWordSpan) { lastWordSpan.classList.remove('typing-word'); lastWordSpan = null; }
-          bubble.appendChild(document.createElement('br'));
-          if (shouldStick) scrollToBottom();
+      const tokens = tokenize(core);
+      for (const t of tokens) {
+        if (t === '\n' || t === '\r\n') {
+          span.appendChild(document.createElement('br'));
+          if (stick && isNearBottom()) scrollToBottom();
           await sleep(WORD_DELAY_MS);
           continue;
         }
-
-        // Whitespace → text node
-        if (/^\s+$/.test(t)){
-          if (lastWordSpan) { lastWordSpan.classList.remove('typing-word'); lastWordSpan = null; }
-          bubble.appendChild(document.createTextNode(t));
-          if (shouldStick) scrollToBottom();
+        if (/^\s+$/.test(t)) {
+          span.appendChild(document.createTextNode(t));
+          if (stick && isNearBottom()) scrollToBottom();
           await sleep(WORD_DELAY_MS * 0.35);
           continue;
         }
+        // word or punctuation
+        span.appendChild(document.createTextNode(t));
+        if (stick && isNearBottom()) scrollToBottom();
 
-        // Word (letters / digits / apostrophes / dash)
-        if (/^[A-Za-z0-9_’'’-]+$/.test(t)){
-          // finish prior word highlight
-          if (lastWordSpan) lastWordSpan.classList.remove('typing-word');
-
-          const span = document.createElement('span');
-          span.className = 'typing-word';
-          span.textContent = t;
-          bubble.appendChild(span);
-          lastWordSpan = span;
-
-          if (shouldStick) scrollToBottom();
-          await sleep(WORD_DELAY_MS);
-          // keep highlight until next token arrives (so it's obvious which word is “being spoken”)
-          continue;
-        }
-
-        // Punctuation or symbols
-        if (lastWordSpan) { lastWordSpan.classList.remove('typing-word'); lastWordSpan = null; }
-        bubble.appendChild(document.createTextNode(t));
-        if (shouldStick) scrollToBottom();
-
-        // add a small pause based on punctuation
         if (/[,;:]/.test(t)) {
           await sleep(PUNCT_PAUSE_MS);
         } else if (/[.!?]/.test(t)) {
           await sleep(SENTENCE_PAUSE_MS);
+        } else if (/^[A-Za-z0-9_’'’-]+$/.test(t)) {
+          await sleep(WORD_DELAY_MS);
         } else {
           await sleep(WORD_DELAY_MS * 0.4);
         }
       }
 
-      // Remove highlight on last word if still present
-      if (lastWordSpan) lastWordSpan.classList.remove('typing-word');
+      // After sentence, add trailing spaces/newlines (outside highlight)
+      if (trailing) bubble.appendChild(document.createTextNode(trailing));
+
+      // Fade out sentence highlight
+      span.classList.remove('typing-sentence');
+      await sleep(60);
+    }
+
+    // Stream entire reply sentence-by-sentence
+    async function streamReply(bubble, fullText, forceStick=false){
+      const stick = forceStick || isNearBottom();
+      const sentences = splitIntoSentences(fullText);
+      for (const s of sentences) {
+        await streamSentence(bubble, s, stick);
+      }
     }
 
     // ====== Chat flow ======
     async function ask(){
       const text = msg.value.trim();
-      if(!text) return;
-      if(text.length > MAX_INPUT){
-        addBubbleInitial("Please keep messages under " + MAX_INPUT + " characters.", "bot", true);
+      if (!text) return;
+      if (text.length > MAX_INPUT){
+        addBubble(`Please keep messages under ${MAX_INPUT} characters.`, 'bot', true);
         return;
       }
 
@@ -314,9 +270,8 @@
       msg.disabled = true;
       sendBtn.disabled = true;
 
-      addBubbleInitial(text, 'me', true);
-
-      const typing = addBubbleInitial('DadKnowsAI is typing…', 'bot', true);
+      addBubble(text, 'me', true);
+      const typing = addBubble('DadKnowsAI is typing…', 'bot', true);
 
       try{
         const r = await fetch('/api/chat', {
@@ -324,36 +279,32 @@
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ message: text })
         });
-
         const data = await r.json().catch(()=> ({}));
         typing.remove();
 
-        if(!r.ok){
-          addBubbleInitial(data?.error || 'Something went wrong. Please try again.', 'bot', true);
-        }else{
-          // Create an empty bubble and stream words into it.
-          const bubble = addBubbleInitial('', 'bot', true);
-          await streamWords(bubble, data.reply || '(no reply)', true);
+        if (!r.ok){
+          addBubble(data?.error || 'Something went wrong. Please try again.', 'bot', true);
+        } else {
+          const bubble = addBubble('', 'bot', true);
+          await streamReply(bubble, data.reply || '(no reply)', true);
         }
-      }catch(e){
+      } catch {
         typing.remove();
-        addBubbleInitial('Network error contacting DadKnowsAI.', 'bot', true);
-      }finally{
+        addBubble('Network error contacting DadKnowsAI.', 'bot', true);
+      } finally {
         msg.disabled = false; sendBtn.disabled = false; msg.focus();
       }
     }
 
-    // Wire up interactions (click + Enter)
+    // Interactions
     sendBtn.addEventListener('click', ask);
     msg.addEventListener('keydown', e => {
-      if(e.key === 'Enter'){
-        e.preventDefault();
-        ask();
-      }
+      if (e.key === 'Enter'){ e.preventDefault(); ask(); }
     });
   </script>
 </body>
 </html>
+
 
 
 
