@@ -6,30 +6,23 @@
   <title>Dad Knows AI</title>
   <meta name="description" content="Helping everyday people use AI in plain English.">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg: #0b1020;
       --card: #0f152b;
       --muted: #a6b0cf;
       --text: #e7ecff;
-      --primary: #5b8cff;       /* blue */
+      --primary: #5b8cff;      /* blue */
       --primary-2:#3e6ff1;
       --outline: #1f2a4d;
-      --success:#10b981;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 16px;
     }
-
     @media (prefers-color-scheme: light) {
       :root{
-        --bg:#f7f8ff;
-        --card:#ffffff;
-        --muted:#5b5f73;
-        --text:#0e1329;
-        --primary:#2d5bff;
-        --primary-2:#1f47dd;
-        --outline:#e6e8f5;
+        --bg:#f7f8ff; --card:#ffffff; --muted:#5b5f73; --text:#0e1329;
+        --primary:#2d5bff; --primary-2:#1f47dd; --outline:#e6e8f5;
         --shadow: 0 10px 30px rgba(14,19,41,.08);
       }
     }
@@ -45,119 +38,120 @@
       color:var(--text);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
+      display:flex; flex-direction:column; min-height:100vh;
     }
 
     .container{
+      width:100%;
       max-width:1080px;
       margin:0 auto;
-      padding:24px 20px 64px;
+      padding:24px 20px 32px;
+      display:flex; flex-direction:column; align-items:center;
     }
 
     header{
-      display:flex;align-items:center;justify-content:space-between;
-      gap:12px;margin-bottom:28px;
+      text-align:center; margin-bottom:18px;
     }
     .brand{
-      display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+      display:flex; align-items:center; justify-content:center; gap:12px;
+      color:inherit; text-decoration:none;
     }
     .logo{
-      width:40px;height:40px;border-radius:10px;
+      width:44px;height:44px;border-radius:10px;
       background: linear-gradient(135deg,var(--primary),#7aa6ff 60%);
       display:grid;place-items:center;
       color:#fff;font-weight:800;letter-spacing:.5px;
       box-shadow:var(--shadow);
     }
-    .nav a{
-      color:var(--muted);text-decoration:none;font-weight:600;
-      padding:8px 12px;border-radius:10px;
-    }
-    .nav a:hover{background-color:rgba(255,255,255,.06);color:var(--text)}
-
-    .hero{
-      text-align:center;margin:40px 0 28px;
-    }
-    .hero h1{
-      font-size: clamp(32px, 5vw, 52px);
-      line-height:1.12;margin:0 0 10px;letter-spacing:.2px;
+    .brand-title{
+      font-size: clamp(34px, 6vw, 60px);
+      margin:0; letter-spacing:.3px; font-weight:800;
     }
     .tagline{
       font-size: clamp(16px, 2.5vw, 20px);
-      color:var(--muted);margin:0 0 28px;font-weight:600;
+      color:var(--muted); margin:6px 0 8px; font-weight:600;
     }
-    .cta-row{
-      display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;
-    }
-    .btn{
-      appearance:none;border:0;cursor:pointer;
-      padding:12px 18px;border-radius:12px;font-weight:700;
-      background:var(--primary);color:#fff;box-shadow:var(--shadow);
-    }
-    .btn:hover{background:var(--primary-2)}
-    .btn.secondary{
-      background:transparent;border:1px solid var(--outline);
-      color:var(--text);box-shadow:none;
-    }
-    .btn.secondary:hover{border-color:var(--primary);color:var(--primary)}
 
-    .grid{
-      display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:stretch;
+    /* Centered chat wrapper */
+    .center-wrap{
+      width:100%;
+      display:flex; justify-content:center; align-items:stretch;
+      padding:16px 0 12px;
     }
-    @media (max-width: 960px){ .grid{ grid-template-columns:1fr; } }
 
-    /* Card */
+    /* Chat card */
     .card{
-      background:var(--card);border:1px solid var(--outline);
-      border-radius:var(--radius);box-shadow:var(--shadow);
+      background:var(--card); border:1px solid var(--outline);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      width:min(900px, 92vw);
+      display:flex; flex-direction:column;
     }
+    .card header{
+      padding:18px 20px; border-bottom:1px solid var(--outline);
+      text-align:center; margin:0;
+    }
+    .card header h2{ margin:0; font-size:20px; letter-spacing:.2px; }
 
-    /* Chat */
-    .chat{
-      display:flex;flex-direction:column;height:100%;
-    }
-    .chat header{
-      padding:18px 18px 10px;margin:0 0 0;
-      border-bottom:1px solid var(--outline);
-    }
-    .chat header h2{
-      font-size:18px;margin:0;color:var(--text);letter-spacing:.2px;
-    }
     .chatbox{
-      padding:18px;
-      height: min(60vh, 560px);
-      overflow:auto;
-      scrollbar-width:thin;
+      padding:18px 18px 0;
+      height: min(62vh, 560px);
+      overflow:auto; scrollbar-width:thin;
     }
+    /* Chat bubbles — bigger & bolder */
     .bubble{
-      max-width: 88%;
-      padding:12px 14px;border-radius:14px;
-      margin:8px 0; line-height:1.55;
-      font-size:16px; white-space:pre-line;
+      max-width: 92%;
+      padding:14px 16px;border-radius:16px;
+      margin:10px 0; line-height:1.65;
+      font-size:18px;               /* bigger text */
+      font-weight:600;              /* bolder */
+      white-space:pre-line;
     }
     .me   { background:rgba(91,140,255,.14); border:1px solid rgba(91,140,255,.35); margin-left:auto; }
-    .bot  { background: #0c1122; border:1px solid var(--outline); }
+    .bot  { background:#0c1122; border:1px solid var(--outline); color:var(--text); }
     @media (prefers-color-scheme: light){
-      .bot{ background:#ffffff; }
+      .bot{ background:#ffffff; color:#0e1329; }
     }
     .bubble strong{ color: var(--primary); }
 
     .composer{
-      display:flex;gap:10px;padding:14px;border-top:1px solid var(--outline);
+      display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--outline);
     }
     .input{
-      flex:1;border:1px solid var(--outline);background:transparent;color:var(--text);
-      border-radius:12px;padding:14px 14px;font-size:16px;font-weight:600;
+      flex:1; border:2px solid var(--outline); background:transparent; color:var(--text);
+      border-radius:12px; padding:14px; font-size:17px; font-weight:700;
     }
-    .send{ padding:14px 16px; border-radius:12px; background:var(--primary); color:#fff; border:0; font-weight:800; }
+    .send{
+      padding:14px 18px; border-radius:12px; background:var(--primary);
+      color:#fff; border:0; font-weight:800; cursor:pointer; box-shadow:var(--shadow);
+    }
     .send:hover{ background:var(--primary-2) }
 
-    /* Info panel */
-    .info{ padding:22px }
-    .info h3{ margin:0 0 10px;font-size:18px }
-    .list{ color:var(--muted);line-height:1.65;margin:0;padding-left:18px }
-    .note{ margin-top:14px;color:var(--muted);font-weight:600 }
+    .notice{
+      padding:8px 18px 16px; color:var(--muted); font-weight:600;
+    }
 
-    /* Footer */
-    footer{ text-align:center; margin-top:34px; color:var(--muted); font-size:14px; }
+    /* Bottom newsletter CTA */
+    .footer-cta{
+      display:flex; flex-direction:column; align-items:center; gap:16px;
+      width:100%; margin:22px 0 8px;
+    }
+    .btn-newsletter{
+      display:inline-block; font-weight:800; letter-spacing:.2px;
+      background:var(--primary); color:#fff; text-decoration:none;
+      padding:14px 20px; border-radius:14px; box-shadow:var(--shadow);
+    }
+    .btn-newsletter:hover{ background:var(--primary-2); }
+
+    footer{
+      width:100%; text-align:center; color:var(--muted); font-size:14px;
+      padding:10px 16px 26px; /* extra bottom space so nothing is cut off */
+    }
+
+    @media (max-width: 520px){
+      .bubble{ font-size:17px; }
+      .input{ font-size:16px; }
+      .card header h2{ font-size:18px; }
+    }
   </style>
 </head>
 <body>
@@ -165,26 +159,14 @@
     <header>
       <a class="brand" href="/">
         <div class="logo">DA</div>
-        <strong>Dad Knows AI</strong>
+        <h1 class="brand-title">Welcome to Dad Knows AI</h1>
       </a>
-      <nav class="nav">
-        <a href="https://weeklycall.dadknowsai.com" target="_blank" rel="noopener">Newsletter</a>
-        <a href="https://www.youtube.com/@DadKnowsAI" target="_blank" rel="noopener">YouTube</a>
-      </nav>
+      <p class="tagline">You have the experience. We have the horsepower.</p>
     </header>
 
-    <section class="hero">
-      <h1>👋 Welcome to Dad Knows AI</h1>
-      <p class="tagline">You have the experience. We have the horsepower.</p>
-      <div class="cta-row">
-        <a class="btn" href="https://weeklycall.dadknowsai.com" target="_blank" rel="noopener">Read the Newsletter</a>
-        <a class="btn secondary" href="#chat">Jump to Chat</a>
-      </div>
-    </section>
-
-    <section class="grid" id="chat">
-      <!-- Chat Card -->
-      <div class="card chat" aria-label="DadKnowsAI chat">
+    <!-- Centered Chat -->
+    <section class="center-wrap">
+      <div class="card" role="region" aria-label="DadKnowsAI Chat">
         <header><h2>Ask me anything!</h2></header>
 
         <div class="chatbox" id="chatbox" aria-live="polite">
@@ -192,10 +174,104 @@
         </div>
 
         <div class="composer">
-          <input id="msg" class="input" type="text" placeholder="Type your message…" aria-label="Your message">
-          <button id="send" class="send">Send</button>
+          <input id="msg" class="input" type="text" placeholder="Type your message…" aria-label="Your message" autocomplete="off">
+          <button id="send" class="send" type="button">Send</button>
         </div>
-        <div class="note">⚡ Responses are generated li
+
+        <div class="notice" id="notice">⚡ Responses are generated by AI in real-time.</div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <div class="footer-cta">
+      <a class="btn-newsletter" href="https://weeklycall.dadknowsai.com" target="_blank" rel="noopener">Read the Newsletter</a>
+    </div>
+
+    <footer>© <span id="y"></span> Dad Knows AI</footer>
+  </div>
+
+  <script>
+    // Elements
+    const chatbox = document.getElementById('chatbox');
+    const msg     = document.getElementById('msg');
+    const sendBtn = document.getElementById('send');
+    const yearEl  = document.getElementById('y');
+    yearEl.textContent = new Date().getFullYear();
+
+    const MAX = 700;
+
+    // Helper: add chat bubble
+    function addBubble(text, who){
+      const b = document.createElement('div');
+      b.className = `bubble ${who}`;
+      b.innerHTML = sanitize(text);
+      chatbox.appendChild(b);
+      chatbox.scrollTop = chatbox.scrollHeight;
+      return b;
+    }
+
+    // Escape HTML, keep line breaks (white-space:pre-line handles rendering)
+    function sanitize(t){
+      return String(t)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replace(/\r?\n/g,'\n');
+    }
+
+    async function ask(){
+      const text = msg.value.trim();
+      if(!text) return;
+      if(text.length > MAX){
+        addBubble(`Please keep messages under ${MAX} characters.`, 'bot');
+        return;
+      }
+
+      // UI state
+      msg.value = '';
+      msg.disabled = true;
+      sendBtn.disabled = true;
+
+      addBubble(text, 'me');
+      const typing = addBubble('DadKnowsAI is typing…', 'bot');
+
+      try{
+        const r = await fetch('/api/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await r.json().catch(()=> ({}));
+        typing.remove();
+
+        if(!r.ok){
+          addBubble(data?.error || 'Something went wrong. Please try again.', 'bot');
+        }else{
+          addBubble(data.reply || '(no reply)', 'bot');
+        }
+      }catch(e){
+        typing.remove();
+        addBubble('Network error contacting DadKnowsAI.', 'bot');
+      }finally{
+        msg.disabled = false;
+        sendBtn.disabled = false;
+        msg.focus();
+      }
+    }
+
+    // Wire up interactions (click + Enter)
+    sendBtn.addEventListener('click', ask);
+    msg.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){
+        e.preventDefault(); // prevent accidental form submission on some browsers
+        ask();
+      }
+    });
+  </script>
+</body>
+</html>
+
 
 
 
