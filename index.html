@@ -18,12 +18,14 @@
       --outline: #1f2a4d;
       --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius: 16px;
+      --highlight: rgba(255, 241, 118, .9); /* soft yellow */
     }
     @media (prefers-color-scheme: light) {
       :root{
         --bg:#f7f8ff; --card:#ffffff; --muted:#5b5f73; --text:#0e1329;
         --primary:#2d5bff; --primary-2:#1f47dd; --outline:#e6e8f5;
         --shadow: 0 10px 30px rgba(14,19,41,.08);
+        --highlight: rgba(255, 237, 145, .9);
       }
     }
 
@@ -88,7 +90,7 @@
       padding:18px 18px 0;
       height: min(62vh, 560px);
       overflow:auto; scrollbar-width:thin;
-      scroll-behavior: smooth; /* smooth only when we decide to scroll */
+      scroll-behavior: smooth;
     }
 
     /* Chat bubbles — bigger & bolder */
@@ -96,14 +98,21 @@
       max-width: 92%;
       padding:14px 16px;border-radius:16px;
       margin:10px 0; line-height:1.65;
-      font-size:18px;
-      font-weight:600;
-      white-space:pre-line;
+      font-size:18px; font-weight:600;
+      white-space:pre-wrap; /* preserve spaces & newlines */
     }
     .me   { background:rgba(91,140,255,.14); border:1px solid rgba(91,140,255,.35); margin-left:auto; }
     .bot  { background:#0c1122; border:1px solid var(--outline); color:var(--text); }
     @media (prefers-color-scheme: light){ .bot{ background:#ffffff; color:#0e1329; } }
     .bubble strong{ color: var(--primary); }
+
+    /* Highlighted current word */
+    .typing-word{
+      background: var(--highlight);
+      border-radius: 4px;
+      transition: background-color .18s ease-out;
+      padding: 0 2px;
+    }
 
     .composer{
       display:flex; gap:10px; padding:14px 18px; border-top:1px solid var(--outline);
@@ -183,92 +192,131 @@
   </div>
 
   <script>
-    // Elements
+    // ====== Config: tune the "speaking pace" here ======
+    const WORD_DELAY_MS   = 140;  // ~120–180 feels like speaking pace
+    const PUNCT_PAUSE_MS  = 90;   // extra pause after , ; :
+    const SENTENCE_PAUSE_MS = 220; // extra pause after . ? !
+    const STICKY_THRESHOLD = 80;   // px from bottom to consider "near bottom"
+    const MAX_INPUT = 700;
+
+    // ====== Elements ======
     const chatbox = document.getElementById('chatbox');
     const msg     = document.getElementById('msg');
     const sendBtn = document.getElementById('send');
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    const MAX = 700;
-    const STICKY_THRESHOLD = 80; // px from bottom to count as “near bottom”
-
-    // Is the viewer already near the bottom (then we keep them there)?
-    function isNearBottom() {
+    // ====== Helpers ======
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+    function isNearBottom(){
       return (chatbox.scrollHeight - chatbox.scrollTop - chatbox.clientHeight) < STICKY_THRESHOLD;
     }
-    function scrollToBottom() { chatbox.scrollTop = chatbox.scrollHeight; }
+    function scrollToBottom(){ chatbox.scrollTop = chatbox.scrollHeight; }
 
-    // Add bubble, with "smart" autoscroll:
-    // - For your own messages we scroll (feels natural).
-    // - For bot messages, only scroll if the user is near the bottom already.
-    function addBubble(text, who, opts = { autoscroll: 'smart' }) {
+    // Minimal escaping (we render words via textNodes to avoid HTML issues)
+    function esc(s){
+      return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+    }
+
+    // Add bubble and (optionally) keep view stuck to bottom
+    function addBubbleInitial(text, who, keepBottom=false){
       const b = document.createElement('div');
       b.className = `bubble ${who}`;
-      b.innerHTML = sanitize(text);
-      const shouldStick = isNearBottom();
+      // start content if provided
+      if (text) b.textContent = text;
       chatbox.appendChild(b);
-
-      if (opts.autoscroll === 'always' || (opts.autoscroll === 'smart' && (who === 'me' || shouldStick))) {
-        scrollToBottom();
-      }
+      if (keepBottom && isNearBottom()) scrollToBottom();
       return b;
     }
 
-    // Incrementally fill a bubble (simulated streaming) without yanking scroll
-    async function streamIntoBubble(bubble, fullText) {
-      const shouldStick = isNearBottom(); // capture stickiness at start
-      const chunks = splitForStreaming(fullText);
-      for (const chunk of chunks) {
-        bubble.innerHTML += sanitize(chunk);
-        if (shouldStick && isNearBottom()) scrollToBottom();
-        await sleep(18); // small delay; adjust for faster/slower typing feel
-      }
+    // Tokenize into words, whitespace, punctuation; keep order.
+    // Includes Unicode apostrophes and dashes.
+    function tokenize(str){
+      const re = /(\r?\n|\s+|[A-Za-z0-9_’'’-]+|[^\sA-Za-z0-9_’'’-])/g;
+      return str.match(re) || [];
     }
 
-    // Split text into small chunks preserving newlines and paragraphs
-    function splitForStreaming(text) {
-      // Break by lines, but keep newline characters so white-space:pre-line renders them.
-      const lines = text.split(/(\r?\n)/);
-      // Further split long lines into ~120-char chunks
-      const chunks = [];
-      for (let part of lines) {
-        if (part === '\n' || part === '\r\n') { chunks.push(part); continue; }
-        while (part.length > 120) {
-          chunks.push(part.slice(0, 120));
-          part = part.slice(120);
+    // Stream text into a bubble word-by-word with highlight.
+    async function streamWords(bubble, fullText, forceStick=false){
+      const shouldStick = forceStick || isNearBottom();
+      const tokens = tokenize(fullText);
+
+      // We build using DOM nodes (text + spans) to avoid unsafe HTML.
+      // When a token is a "word", we wrap in span.typing-word, then remove highlight after a beat.
+      let lastWordSpan = null;
+
+      for (let i=0; i<tokens.length; i++){
+        const t = tokens[i];
+
+        // If newline: append a <br>
+        if (t === '\n' || t === '\r\n'){
+          if (lastWordSpan) { lastWordSpan.classList.remove('typing-word'); lastWordSpan = null; }
+          bubble.appendChild(document.createElement('br'));
+          if (shouldStick) scrollToBottom();
+          await sleep(WORD_DELAY_MS);
+          continue;
         }
-        chunks.push(part);
+
+        // Whitespace → text node
+        if (/^\s+$/.test(t)){
+          if (lastWordSpan) { lastWordSpan.classList.remove('typing-word'); lastWordSpan = null; }
+          bubble.appendChild(document.createTextNode(t));
+          if (shouldStick) scrollToBottom();
+          await sleep(WORD_DELAY_MS * 0.35);
+          continue;
+        }
+
+        // Word (letters / digits / apostrophes / dash)
+        if (/^[A-Za-z0-9_’'’-]+$/.test(t)){
+          // finish prior word highlight
+          if (lastWordSpan) lastWordSpan.classList.remove('typing-word');
+
+          const span = document.createElement('span');
+          span.className = 'typing-word';
+          span.textContent = t;
+          bubble.appendChild(span);
+          lastWordSpan = span;
+
+          if (shouldStick) scrollToBottom();
+          await sleep(WORD_DELAY_MS);
+          // keep highlight until next token arrives (so it's obvious which word is “being spoken”)
+          continue;
+        }
+
+        // Punctuation or symbols
+        if (lastWordSpan) { lastWordSpan.classList.remove('typing-word'); lastWordSpan = null; }
+        bubble.appendChild(document.createTextNode(t));
+        if (shouldStick) scrollToBottom();
+
+        // add a small pause based on punctuation
+        if (/[,;:]/.test(t)) {
+          await sleep(PUNCT_PAUSE_MS);
+        } else if (/[.!?]/.test(t)) {
+          await sleep(SENTENCE_PAUSE_MS);
+        } else {
+          await sleep(WORD_DELAY_MS * 0.4);
+        }
       }
-      return chunks;
+
+      // Remove highlight on last word if still present
+      if (lastWordSpan) lastWordSpan.classList.remove('typing-word');
     }
 
-    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-    // Escape HTML, keep line breaks (white-space:pre-line handles rendering)
-    function sanitize(t){
-      return String(t)
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replace(/\r?\n/g,'\n');
-    }
-
+    // ====== Chat flow ======
     async function ask(){
       const text = msg.value.trim();
       if(!text) return;
-      if(text.length > MAX){
-        addBubble(`Please keep messages under ${MAX} characters.`, 'bot', {autoscroll:'smart'});
+      if(text.length > MAX_INPUT){
+        addBubbleInitial("Please keep messages under " + MAX_INPUT + " characters.", "bot", true);
         return;
       }
 
-      // UI state
       msg.value = '';
       msg.disabled = true;
       sendBtn.disabled = true;
 
-      addBubble(text, 'me', {autoscroll:'always'});
+      addBubbleInitial(text, 'me', true);
 
-      const typing = addBubble('DadKnowsAI is typing…', 'bot', {autoscroll:'smart'});
+      const typing = addBubbleInitial('DadKnowsAI is typing…', 'bot', true);
 
       try{
         const r = await fetch('/api/chat', {
@@ -281,19 +329,17 @@
         typing.remove();
 
         if(!r.ok){
-          addBubble(data?.error || 'Something went wrong. Please try again.', 'bot', {autoscroll:'smart'});
+          addBubbleInitial(data?.error || 'Something went wrong. Please try again.', 'bot', true);
         }else{
-          // Create an empty bubble and stream the text into it
-          const bubble = addBubble('', 'bot', {autoscroll:'smart'});
-          await streamIntoBubble(bubble, data.reply || '(no reply)');
+          // Create an empty bubble and stream words into it.
+          const bubble = addBubbleInitial('', 'bot', true);
+          await streamWords(bubble, data.reply || '(no reply)', true);
         }
       }catch(e){
         typing.remove();
-        addBubble('Network error contacting DadKnowsAI.', 'bot', {autoscroll:'smart'});
+        addBubbleInitial('Network error contacting DadKnowsAI.', 'bot', true);
       }finally{
-        msg.disabled = false;
-        sendBtn.disabled = false;
-        msg.focus();
+        msg.disabled = false; sendBtn.disabled = false; msg.focus();
       }
     }
 
@@ -308,6 +354,7 @@
   </script>
 </body>
 </html>
+
 
 
 
