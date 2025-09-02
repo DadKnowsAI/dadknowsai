@@ -1,151 +1,202 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Dad Knows AI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      :root { --blue:#2563eb; --blue-d:#1d4ed8; --bg:#f9fafb; --text:#111; }
-      body {
-        font-family: system-ui, sans-serif;
-        margin: 0; padding: 2rem;
-        background: var(--bg); color: var(--text);
-        display:flex; flex-direction:column; align-items:center; text-align:center; min-height:100vh;
-      }
-      h1 { font-size: clamp(32px,5vw,48px); margin: 0 0 .5rem; }
-      h3.tagline { font-size:1.25rem; font-weight:500; margin:0 0 1.5rem; color:#444; }
-      p.lead { font-size:1.2rem; line-height:1.55; max-width:900px; margin:1rem auto 2rem; }
-      .button {
-        display:inline-block; margin-top:1rem; padding:.75rem 1.25rem;
-        background:var(--blue); color:#fff; border-radius:8px; text-decoration:none; font-weight:600;
-      }
-      .button:hover { background:var(--blue-d); }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dad Knows AI</title>
+  <meta name="description" content="Helping everyday people use AI in plain English.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0b1020;
+      --card: #0f152b;
+      --muted: #a6b0cf;
+      --text: #e7ecff;
+      --primary: #5b8cff;       /* blue */
+      --primary-2:#3e6ff1;
+      --outline: #1f2a4d;
+      --success:#10b981;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
 
-      .chatbox {
-        margin-top:1.5rem; background:#fff; border:1px solid #ddd; border-radius:12px;
-        padding:1rem; width:100%; max-width:900px; text-align:left; box-shadow:0 2px 8px rgba(0,0,0,.08);
+    @media (prefers-color-scheme: light) {
+      :root{
+        --bg:#f7f8ff;
+        --card:#ffffff;
+        --muted:#5b5f73;
+        --text:#0e1329;
+        --primary:#2d5bff;
+        --primary-2:#1f47dd;
+        --outline:#e6e8f5;
+        --shadow: 0 10px 30px rgba(14,19,41,.08);
       }
-      .chatbox h2 { font-size:1.35rem; margin:.25rem 0 1rem; text-align:center; }
+    }
 
-      .messages {
-        border:1px solid #e5e7eb; border-radius:10px; background:#fafafa;
-        padding:1rem; height: min(55vh, 520px); overflow-y:auto; margin-bottom:1rem;
-        font-size:1.05rem; line-height:1.6;
-        white-space:pre-line; /* preserve line breaks */
-      }
-      .msg { margin:.5rem 0; }
-      .msg.you strong { color:#0f172a; }
-      .msg.bot strong { color:var(--blue-d); }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 15% -10%, rgba(91,140,255,.25), transparent 45%),
+                  radial-gradient(1000px 700px at 100% 0%, rgba(16,185,129,.14), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
 
-      .input-row { display:flex; gap:.5rem; }
-      .input-row input {
-        flex:1; padding:1rem; font-size:1.1rem; font-weight:600;
-        border:2px solid var(--blue); border-radius:10px;
-      }
-      .input-row button {
-        padding:1rem 1.15rem; font-size:1rem; font-weight:700;
-        background:var(--blue); color:#fff; border:none; border-radius:10px; cursor:pointer; min-width:100px;
-      }
-      .input-row button:hover { background:var(--blue-d); }
+    .container{
+      max-width:1080px;
+      margin:0 auto;
+      padding:24px 20px 64px;
+    }
 
-      .note { margin-top:1rem; font-weight:600; color:#222; text-align:center; }
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:12px;margin-bottom:28px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:10px;
+      background: linear-gradient(135deg,var(--primary),#7aa6ff 60%);
+      display:grid;place-items:center;
+      color:#fff;font-weight:800;letter-spacing:.5px;
+      box-shadow:var(--shadow);
+    }
+    .nav a{
+      color:var(--muted);text-decoration:none;font-weight:600;
+      padding:8px 12px;border-radius:10px;
+    }
+    .nav a:hover{background-color:rgba(255,255,255,.06);color:var(--text)}
 
-      @media (max-width: 480px) {
-        body { padding: 1rem; }
-        .chatbox { padding: .75rem; }
-        .messages { font-size: 1rem; }
-      }
-    </style>
-  </head>
-  <body>
-    <h1>👋 Welcome to Dad Knows AI</h1>
-    <h3 class="tagline">You have the experience. We have the horsepower.</h3>
+    .hero{
+      text-align:center;margin:40px 0 28px;
+    }
+    .hero h1{
+      font-size: clamp(32px, 5vw, 52px);
+      line-height:1.12;margin:0 0 10px;letter-spacing:.2px;
+    }
+    .tagline{
+      font-size: clamp(16px, 2.5vw, 20px);
+      color:var(--muted);margin:0 0 28px;font-weight:600;
+    }
+    .cta-row{
+      display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;
+    }
+    .btn{
+      appearance:none;border:0;cursor:pointer;
+      padding:12px 18px;border-radius:12px;font-weight:700;
+      background:var(--primary);color:#fff;box-shadow:var(--shadow);
+    }
+    .btn:hover{background:var(--primary-2)}
+    .btn.secondary{
+      background:transparent;border:1px solid var(--outline);
+      color:var(--text);box-shadow:none;
+    }
+    .btn.secondary:hover{border-color:var(--primary);color:var(--primary)}
 
-    <div class="chatbox" role="region" aria-label="DadKnowsAI Chat">
-      <h2>Ask me anything!</h2>
+    .grid{
+      display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:stretch;
+    }
+    @media (max-width: 960px){ .grid{ grid-template-columns:1fr; } }
 
-      <div class="messages" id="messages" aria-live="polite">
-        <p class="msg bot"><strong>DadKnowsAI:</strong> Tell me what you’re trying to do. I’ll give clear steps that work today.</p>
+    /* Card */
+    .card{
+      background:var(--card);border:1px solid var(--outline);
+      border-radius:var(--radius);box-shadow:var(--shadow);
+    }
+
+    /* Chat */
+    .chat{
+      display:flex;flex-direction:column;height:100%;
+    }
+    .chat header{
+      padding:18px 18px 10px;margin:0 0 0;
+      border-bottom:1px solid var(--outline);
+    }
+    .chat header h2{
+      font-size:18px;margin:0;color:var(--text);letter-spacing:.2px;
+    }
+    .chatbox{
+      padding:18px;
+      height: min(60vh, 560px);
+      overflow:auto;
+      scrollbar-width:thin;
+    }
+    .bubble{
+      max-width: 88%;
+      padding:12px 14px;border-radius:14px;
+      margin:8px 0; line-height:1.55;
+      font-size:16px; white-space:pre-line;
+    }
+    .me   { background:rgba(91,140,255,.14); border:1px solid rgba(91,140,255,.35); margin-left:auto; }
+    .bot  { background: #0c1122; border:1px solid var(--outline); }
+    @media (prefers-color-scheme: light){
+      .bot{ background:#ffffff; }
+    }
+    .bubble strong{ color: var(--primary); }
+
+    .composer{
+      display:flex;gap:10px;padding:14px;border-top:1px solid var(--outline);
+    }
+    .input{
+      flex:1;border:1px solid var(--outline);background:transparent;color:var(--text);
+      border-radius:12px;padding:14px 14px;font-size:16px;font-weight:600;
+    }
+    .send{ padding:14px 16px; border-radius:12px; background:var(--primary); color:#fff; border:0; font-weight:800; }
+    .send:hover{ background:var(--primary-2) }
+
+    /* Info panel */
+    .info{ padding:22px }
+    .info h3{ margin:0 0 10px;font-size:18px }
+    .list{ color:var(--muted);line-height:1.65;margin:0;padding-left:18px }
+    .note{ margin-top:14px;color:var(--muted);font-weight:600 }
+
+    /* Footer */
+    footer{ text-align:center; margin-top:34px; color:var(--muted); font-size:14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <a class="brand" href="/">
+        <div class="logo">DA</div>
+        <strong>Dad Knows AI</strong>
+      </a>
+      <nav class="nav">
+        <a href="https://weeklycall.dadknowsai.com" target="_blank" rel="noopener">Newsletter</a>
+        <a href="https://www.youtube.com/@DadKnowsAI" target="_blank" rel="noopener">YouTube</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h1>👋 Welcome to Dad Knows AI</h1>
+      <p class="tagline">You have the experience. We have the horsepower.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://weeklycall.dadknowsai.com" target="_blank" rel="noopener">Read the Newsletter</a>
+        <a class="btn secondary" href="#chat">Jump to Chat</a>
       </div>
+    </section>
 
-      <div class="input-row">
-        <input id="chat-input" type="text" placeholder="Type your message..." aria-label="Your message">
-        <button id="send-btn" aria-label="Send message">Send</button>
-      </div>
+    <section class="grid" id="chat">
+      <!-- Chat Card -->
+      <div class="card chat" aria-label="DadKnowsAI chat">
+        <header><h2>Ask me anything!</h2></header>
 
-      <p class="note">⚡ Responses are generated live by <span style="color:var(--blue);">DadKnowsAI</span></p>
-    </div>
+        <div class="chatbox" id="chatbox" aria-live="polite">
+          <div class="bubble bot"><strong>DadKnowsAI:</strong> Tell me what you’re trying to do. I’ll give clear steps that work today.</div>
+        </div>
 
-    <p class="lead">Helping everyday people use AI in plain English. From autocorrect to chatbots, AI is already part of your life—let’s make it work for you.</p>
-    <a href="https://weeklycall.dadknowsai.com" class="button">Read the Newsletter</a>
+        <div class="composer">
+          <input id="msg" class="input" type="text" placeholder="Type your message…" aria-label="Your message">
+          <button id="send" class="send">Send</button>
+        </div>
+        <div class="note">⚡ Responses are generated li
 
-    <!-- Chat script -->
-    <script>
-      const msgs = document.getElementById('messages');
-      const input = document.getElementById('chat-input');
-      const send  = document.getElementById('send-btn');
-      const MAX_INPUT_CHARS = 700;
-
-      // Escape HTML + preserve newlines
-      function safeFormat(text) {
-        return text
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;');
-      }
-
-      function append(role, text, danger=false) {
-        const p = document.createElement('p');
-        p.className = `msg ${role === 'You' ? 'you' : 'bot'}`;
-        if (danger) p.style.color = 'crimson';
-        p.innerHTML = `<strong>${role}:</strong> ${safeFormat(text)}`;
-        msgs.appendChild(p);
-        msgs.scrollTop = msgs.scrollHeight;
-      }
-
-      async function ask(text) {
-        if (!text) return;
-        if (text.length > MAX_INPUT_CHARS) {
-          append('System', `Please keep messages under ${MAX_INPUT_CHARS} characters.`, true);
-          return;
-        }
-
-        input.value = '';
-        input.disabled = true; send.disabled = true;
-
-        append('You', text);
-        const typing = document.createElement('p');
-        typing.id = 'typing'; typing.className = 'msg bot';
-        typing.innerHTML = '<em>DadKnowsAI is typing…</em>';
-        msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
-
-        try {
-          const r = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-          });
-          const data = await r.json().catch(() => ({}));
-          document.getElementById('typing')?.remove();
-
-          if (!r.ok) {
-            append('Error', data?.error || 'Request failed.', true);
-          } else {
-            append('DadKnowsAI', data.reply || '(no reply)');
-          }
-        } catch {
-          document.getElementById('typing')?.remove();
-          append('Error', 'Network error contacting DadKnowsAI.', true);
-        } finally {
-          input.disabled = false; send.disabled = false; input.focus();
-        }
-      }
-
-      send.addEventListener('click', () => ask(input.value.trim()));
-      input.addEventListener('keydown', e => { if (e.key === 'Enter') ask(input.value.trim()); });
-    </script>
-  </body>
-</html>
 
 
 
